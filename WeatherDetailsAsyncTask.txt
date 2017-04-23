@@ -1,0 +1,50 @@
+package com.sunilkumar.alterego.myapplication;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/**
+ * Created by Sunilkumar on 08-03-2017.
+ */
+
+public class WeatherData extends AsyncTask<String, Void, Void> {
+    ProgressDialog mProgressDialog;
+    String description,json;
+    Context mContext;
+    public WeatherData(Context context){
+        mContext = context;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        mProgressDialog = ProgressDialog.show(mContext,"Checking . . .","");
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        mProgressDialog.dismiss();
+        if (!json.isEmpty()) {
+            try {
+                JSONObject jsonObject = new JSONObject(json);
+                JSONArray weather = jsonObject.getJSONArray("weather");
+                JSONObject weatherDetails = weather.getJSONObject(0);
+                description = weatherDetails.getString("description");
+            } catch (final Exception e) {}
+        }
+    }
+
+    @Override
+    protected Void doInBackground(String ... url) {
+        HTTPHandler httpHandler = new HTTPHandler();
+        json = httpHandler.makeServiceCall(url[0]);
+        Log.i("Response from url", json);
+        return null;
+    }
+}
